@@ -16,6 +16,7 @@ from data_utils import SegBatcher
 
 
 def init_mode_config(vocab_size, tag_size):
+    #OrderedDict根据放入元素的顺序进行排序
     model_config = OrderedDict()
 
     model_config["char_dim"] = FLAGS.char_dim
@@ -36,15 +37,19 @@ def main(argv):
     word_to_id, tag_to_id, id_to_tag = data_utils.load_map_file(FLAGS.map_file)
     id_to_word = {v: k for k, v in word_to_id.items()}
 
+    #训练集测试集的数量和词汇数目
     num_dict = data_utils.load_size_file(FLAGS.size_file)
     train_num = num_dict["train_num"]
     dev_num = num_dict["dev_num"]
     test_num = num_dict['test_num']
 
+
     model_config = init_mode_config(len(word_to_id), len(tag_to_id))
     print(model_config)
 
+    #tf.ConfigProto一般用在创建session的时候。用来对session进行参数配置
     tf_config = tf.ConfigProto()
+    ## 使用allow_growth option，刚一开始分配少量的GPU容量，然后按需慢慢的增加，由于不会释放内存，所以会导致碎片
     tf_config.gpu_options.allow_growth = True
 
     with tf.Graph().as_default():

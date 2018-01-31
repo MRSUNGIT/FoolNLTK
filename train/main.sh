@@ -33,7 +33,9 @@ WORD2VEC=./third_party/word2vec/word2vec
 
 VEC_OUT_DIR="$DATA_OUT_DIR"/vec/
 
+#存储的是训练文本，字与字之间空格分隔
 CHAR_PRE_TRAIN_FILE="$VEC_OUT_DIR"/char_vec_train.txt
+#存储的字的字向量
 EMBEDING_FILE="$VEC_OUT_DIR"/char_vec.txt
 
 

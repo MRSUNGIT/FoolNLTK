@@ -67,7 +67,9 @@ if __name__ == '__main__':
     #     os.mkdir(args.out_dir)
 
     with open(args.map_file, 'wb') as f:
+        #生成字-序列数的dic
         vocab = create_vocab(embeding_file=args.embeding_file)
+        #生成tag-id对应关系,id就是自增的序数
         tag_to_id, id_to_tag = tag_to_map(train_file=args.train_file, tag_index=args.tag_index)
         print("tag map result: ")
         print(tag_to_id)

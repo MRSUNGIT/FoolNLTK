@@ -12,8 +12,10 @@ def load_map_file(map_filename):
     return vocab, tag_to_id, id_to_tag
 
 
+#将数据整理为tfrecord的格式，方便内存队列读取，适用于数据量较大时
 def seg_to_tfrecords(text_file, out_dir, map_file, out_name, indexs=[0, 1]):
     out_filename = os.path.join(out_dir, out_name + ".tfrecord")
+    #前期映射的字-id tag-id加载回来
     vocab, tag_to_id, id_to_tag = load_map_file(map_file)
 
     writer = tf.python_io.TFRecordWriter(out_filename)
@@ -25,6 +27,7 @@ def seg_to_tfrecords(text_file, out_dir, map_file, out_name, indexs=[0, 1]):
         sent = []
         for lineno, line in enumerate(f):
             line = line.strip("\n")
+            ##仅当读取到空行时才开始处理
             if not line:
                 if sent:
                     num_sample += 1
@@ -36,21 +39,25 @@ def seg_to_tfrecords(text_file, out_dir, map_file, out_name, indexs=[0, 1]):
 
             word_info = line.split("\t")
             word_info = [word_info[i] for i in indexs]
+            #sent记录标注数据里的 char-tag对
             sent.append(word_info)
     print("oov rate : %f" % (1.0 * oov_count / total_word))
 
     return num_sample
 
 
+#生成一条tfrecord记录,从标注数据中，传入的sent就是一条标注数据
 def create_one_seg_sample(writer, sent, char_to_id, tag_to_id):
     char_list = []
     seg_label_list = []
     oov_count = 0
     word_count = 0
     for word in sent:
+        #word is char-tag对
         ch = word[0]
         label = word[1]
         word_count += 1
+        #检测是否在目前的词向量表中
         if ch in char_to_id:
             char_list.append(char_to_id[ch])
         else:
